@@ -3,97 +3,134 @@ package cleancode;
 import java.util.Scanner;
 
 public class Ejercicio03 {
-	/**
-	 * Pide el pin al usuario, si supera los intentos definidos se bloquea la cuenta
-	 * 
-	 * @param sc Scanner para que el usuario pueda escribir por teclado
-	 * @return acceso Si es -1 se bloqueará, si es 1 accederá
-	 */
-	static int accesoCuentaBancaria(Scanner sc) {
-		int intentos = 0;
-		int acceso = 0; // contadores
-
-		while (intentos < 3) {
-			System.out.println("PIN:");
-			int pin = sc.nextInt();
-			if (pin == 1234) {
-				acceso = 1;
-				return acceso;
-			} else {
-				System.out.println("Incorrecto");
-			}
-			intentos = intentos + 1;
-		}
-		return acceso;
-	}
-
-	static double menu(Scanner sc, String[] h, int[] k, double s) {
-		int op = 0;
-		double c = 0; // variables
-		String t = ""; // texto
-		// aqui se ejecuta el cajero automatico, es muy facil
-		while (op != 5) {
-			System.out.println("1ing 2ret 3sal 4his 5x");
-			op = sc.nextInt();
-			if (op == 1) {
-				System.out.println("cuanto");
-				c = sc.nextDouble();
-				if (c <= 0) {
-					System.out.println("no");
-				} else {
-					s = s + c;
-					h[k[0] % 5] = "ING " + c + " saldo=" + s;
-					k[0] = k[0] + 1;
-				}
-			} else if (op == 2) {
-				System.out.println("cuanto");
-				c = sc.nextDouble();
-				if (c <= 0) {
-					System.out.println("no");
-				} else if (c > s) {
-					System.out.println("nop");
-				} else {
-					s = s - c;
-					h[k[0] % 5] = "RET " + c + " saldo=" + s;
-					k[0] = k[0] + 1;
-				}
-			} else if (op == 3) {
-				System.out.println("saldo " + s);
-			} else if (op == 4) {
-				System.out.println("HIST");
-				for (int z = 0; z < 5; z++) {
-					if (h[z] != null)
-						System.out.println(h[z]);
-					else
-						System.out.println("-"); // rellena con guiones por estética
-				}
-			} else {
-				if (op != 5)
-					System.out.println("???");
-			}
-		}
-		return s; // devuelve saldo (porque si)
-	}
 
 	public static void main(String[] args) {
+		final int PIN_CORRECTO = 1234;
+		final int INTENTOS_MAX = 3;
+		final int HISTORIAL_MAX = 5;
 
-		Scanner sc = new Scanner(System.in);
+		Scanner scanner = new Scanner(System.in);
 
-		double saldo = 500;
-		String[] h = new String[5];
-		int[] k = new int[] { 0 };
-		int acceso = accesoCuentaBancaria(sc);
+		double saldo = 500.0;
+		String[] historial = new String[HISTORIAL_MAX];
+		int[] contadorHistorial = new int[] { 0 };
 
-		if (acceso == -1) {
-			System.out.println("Bloqueado");
-		} else if (acceso == 0) {
-			System.out.println("Error. Intentelo de nuevo");
+		// Verificación de PIN
+		boolean acceso = verificarPin(scanner, PIN_CORRECTO, INTENTOS_MAX);
+
+		if (!acceso) {
+			System.out.println("Bloqueado o intento incorrecto");
+		} else {
+			saldo = ejecutarMenu(scanner, historial, contadorHistorial, saldo);
+			System.out.println("Cerrando sesión...");
 		}
 
-		saldo = menu(sc, h, k, saldo);
-		System.out.println("Cerrando sesión...");
+		scanner.close();
+	}
 
-		// Cerrar scanner
-		sc.close();
+	/**
+	 * Verifica el PIN del usuario con un solo return
+	 */
+	private static boolean verificarPin(Scanner sc, int pinCorrecto, int intentosMax) {
+		boolean acceso = false; // valor por defecto
+		int intento = 0;
+
+		while (intento < intentosMax) {
+			System.out.print("Ingrese PIN: ");
+			int pinIngresado = sc.nextInt();
+
+			if (pinIngresado == pinCorrecto) {
+				acceso = true; // correcto
+				intento = intentosMax; // salir del bucle
+			} else {
+				System.out.println("PIN incorrecto");
+				intento++;
+			}
+		}
+
+		return acceso; // un único return
+	}
+
+	/**
+	 * Ejecuta el menú del cajero automático
+	 */
+	private static double ejecutarMenu(Scanner sc, String[] historial, int[] contadorHistorial, double saldo) {
+		final int OPCION_INGRESAR = 1;
+		final int OPCION_RETIRO = 2;
+		final int OPCION_SALDO = 3;
+		final int OPCION_HISTORIAL = 4;
+		final int OPCION_SALIR = 5;
+
+		int opcion = 0;
+		double monto;
+
+		while (opcion != OPCION_SALIR) {
+			System.out.println("Menú: 1-Ingresar 2-Retirar 3-Ver Saldo 4-Historial 5-Salir");
+			opcion = sc.nextInt();
+
+			switch (opcion) {
+			case OPCION_INGRESAR:
+				System.out.print("Ingrese monto: ");
+				monto = sc.nextDouble();
+				if (monto <= 0) {
+					System.out.println("Monto no válido");
+				} else {
+					saldo += monto;
+					registrarOperacion(historial, contadorHistorial, "ING", monto, saldo);
+				}
+				break;
+
+			case OPCION_RETIRO:
+				System.out.print("Ingrese monto: ");
+				monto = sc.nextDouble();
+				if (monto <= 0) {
+					System.out.println("Monto no válido");
+				} else if (monto > saldo) {
+					System.out.println("Saldo insuficiente");
+				} else {
+					saldo -= monto;
+					registrarOperacion(historial, contadorHistorial, "RET", monto, saldo);
+				}
+				break;
+
+			case OPCION_SALDO:
+				System.out.println("Saldo actual: " + saldo);
+				break;
+
+			case OPCION_HISTORIAL:
+				System.out.println("Historial de operaciones:");
+				imprimirHistorial(historial);
+				break;
+
+			default:
+				if (opcion != OPCION_SALIR) {
+					System.out.println("Opción no válida");
+				}
+			}
+		}
+
+		return saldo; // único return
+	}
+
+	/**
+	 * Registra una operación (ingreso o retiro) en el historial circular
+	 */
+	private static void registrarOperacion(String[] historial, int[] contadorHistorial, String tipo, double monto,
+			double saldo) {
+		historial[contadorHistorial[0] % historial.length] = tipo + " " + monto + " Saldo=" + saldo;
+		contadorHistorial[0]++;
+	}
+
+	/**
+	 * Imprime el historial de operaciones. Si no hay operación, imprime guiones.
+	 */
+	private static void imprimirHistorial(String[] historial) {
+		for (String registro : historial) {
+			if (registro != null) {
+				System.out.println(registro);
+			} else {
+				System.out.println("-");
+			}
+		}
 	}
 }
