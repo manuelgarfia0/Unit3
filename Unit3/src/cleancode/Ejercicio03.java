@@ -55,21 +55,15 @@ public class Ejercicio03 {
 	 * Ejecuta el menú del cajero automático
 	 */
 	private static double ejecutarMenu(Scanner sc, String[] historial, int[] contadorHistorial, double saldo) {
-		final int OPCION_INGRESAR = 1;
-		final int OPCION_RETIRO = 2;
-		final int OPCION_SALDO = 3;
-		final int OPCION_HISTORIAL = 4;
-		final int OPCION_SALIR = 5;
-
 		int opcion = 0;
 		double monto;
 
-		while (opcion != OPCION_SALIR) {
+		while (opcion != 5) {
 			System.out.println("Menú: 1-Ingresar 2-Retirar 3-Ver Saldo 4-Historial 5-Salir");
 			opcion = sc.nextInt();
 
 			switch (opcion) {
-			case OPCION_INGRESAR:
+			case 1:
 				System.out.print("Ingrese monto: ");
 				monto = sc.nextDouble();
 				if (monto <= 0) {
@@ -80,7 +74,7 @@ public class Ejercicio03 {
 				}
 				break;
 
-			case OPCION_RETIRO:
+			case 2:
 				System.out.print("Ingrese monto: ");
 				monto = sc.nextDouble();
 				if (monto <= 0) {
@@ -93,17 +87,17 @@ public class Ejercicio03 {
 				}
 				break;
 
-			case OPCION_SALDO:
+			case 3:
 				System.out.println("Saldo actual: " + saldo);
 				break;
 
-			case OPCION_HISTORIAL:
+			case 4:
 				System.out.println("Historial de operaciones:");
 				imprimirHistorial(historial);
 				break;
 
 			default:
-				if (opcion != OPCION_SALIR) {
+				if (opcion != 5) {
 					System.out.println("Opción no válida");
 				}
 			}
