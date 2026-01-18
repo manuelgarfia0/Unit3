@@ -13,18 +13,27 @@ public class Ejercicio02Avanzado {
 		// Preguntar al primer jugador que introduzca la contraseña
 		System.out.println("Introduce la contraseña a adivinar: ");
 		contraseña = sc.nextLine();
+		// Inicializo adivinar para entrar al bucle
+		adivinar = "";
 		// Bucle para advinar la contraseña
 		while (!adivinar.equals(contraseña)) {
-			System.out.println("Pista: ");
-			for (int i = 0; i < contraseña.length(); i++) {
-				if (adivinar.charAt(i) == contraseña.charAt(i)) {
-					System.out.print(contraseña.charAt(i));
-				} else {
-					System.out.print("*");
-				}
-			}
-			System.out.println("Introduce un contraseña: ");
 
+			System.out.println("Introduce una contraseña: ");
+			adivinar = sc.nextLine();
+
+			if (adivinar.length() == contraseña.length()) {
+				System.out.println("Pista: ");
+				for (int i = 0; i < contraseña.length(); i++) {
+					if (adivinar.charAt(i) == contraseña.charAt(i)) {
+						System.out.print(contraseña.charAt(i));
+					} else {
+						System.out.print("*");
+					}
+				}
+				System.out.println();
+			} else {
+				System.out.println("La contraseña debe de tener " + contraseña.length() + " caracteres.");
+			}
 		}
 		// Si sale del bucle es porque ha adivinado la contraseña
 		System.out.println("Felicidades, has adivinado la contraseña");
